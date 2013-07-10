@@ -29,6 +29,10 @@
 
 #include <string>
 
+#include <QWidget>
+#include <QDesktopWidget>
+#include <QApplication>
+
 #include <boost/bind.hpp>
 
 #include <OGRE/OgreRoot.h>
@@ -39,6 +43,8 @@
 
 #include <rviz/view_manager.h>
 #include <rviz/display_context.h>
+#include <rviz/ogre_helpers/render_widget.h>
+#include <rviz/ogre_helpers/render_system.h>
 
 #include "rviz_oculus/oculus_display.h"
 #include "rviz_oculus/ogre_oculus.h"
@@ -61,7 +67,33 @@ OculusDisplay::~OculusDisplay()
 
 void OculusDisplay::onInitialize()
 {
-  window_ = Ogre::Root::getSingleton().createRenderWindow("Oculus", 1280, 800, false);
+  Ogre::Root &root = Ogre::Root::getSingleton();
+
+  rviz::RenderWidget *render_widget = new rviz::RenderWidget( rviz::RenderSystem::get() );
+  QRect screen_res = QApplication::desktop()->screenGeometry(1);
+  //render_widget->setWindowFlags();
+  render_widget->setGeometry( screen_res );
+  render_widget->show();
+  //render_widget->showFullScreen();
+
+  ROS_INFO_STREAM( root.getDisplayMonitorCount() );
+
+  window_ = render_widget->getRenderWindow();
+  window_->setVisible(true);
+  window_->setAutoUpdated(true);
+
+  /*
+  if ( root.getDisplayMonitorCount() > 1 )
+  {
+    ROS_INFO_STREAM("Creating Oculus window on display 1.");
+    Ogre::NameValuePairList params;
+    params["monitorIndex"] = "1";
+    window_ = root.createRenderWindow("Oculus", 1280, 800, true, &params);
+  }
+
+  window_ = root.createRenderWindow("Oculus", 1280, 800, false);
+  */
+
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
   oculus_ = new Oculus();
   oculus_->setupOculus();
