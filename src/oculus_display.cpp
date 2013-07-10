@@ -69,8 +69,11 @@ OculusDisplay::OculusDisplay()
   Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(ROS_PACKAGE_NAME);
 
   fullscreen_property_ = new rviz::BoolProperty( "Render to Oculus", false,
-    "If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.",
+    "",
     this, SLOT(onFullScreenChanged()));
+
+  horizontal_property_ = new rviz::BoolProperty( "Horizontal", true,
+    "If checked, will ignore the pitch component of the RViz camera.", this);
 
   connect( QApplication::desktop(), SIGNAL( screenCountChanged ( int ) ), this, SLOT( onScreenCountChanged(int)) );
 }
@@ -91,17 +94,19 @@ void OculusDisplay::onScreenCountChanged( int newCount )
   {
     fullscreen_property_->setBool(false);
     fullscreen_property_->setReadOnly(true);
+    fullscreen_property_->setDescription("No secondary screen detected. Cannot render to Oculus device.");
   }
   else
   {
     fullscreen_property_->setReadOnly(false);
+    fullscreen_property_->setDescription("If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.");
   }
 }
 
 
 void OculusDisplay::onFullScreenChanged()
 {
-  if ( fullscreen_property_->getBool() )
+  if ( fullscreen_property_->getBool() && QApplication::desktop()->numScreens() > 1 )
   {
     QRect screen_res = QApplication::desktop()->screenGeometry(1);
     //render_widget->setWindowFlags();
@@ -191,7 +196,22 @@ void OculusDisplay::updateCamera()
   const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
   scene_node_->setPosition( cam->getDerivedPosition() );
 
-  scene_node_->setOrientation( cam->getDerivedOrientation() );
+  Ogre::Quaternion ori = cam->getDerivedOrientation();
+
+  if ( horizontal_property_->getBool() )
+  {
+    Ogre::Vector3 x_axis = ori * Ogre::Vector3(1,0,0);
+    float yaw = atan2( x_axis.y, x_axis.x );// - M_PI*0.5;
+
+    // we're working in OpenGL corrdinates now
+    ori.FromAngleAxis( Ogre::Radian(yaw), Ogre::Vector3::UNIT_Z );
+
+    Ogre::Quaternion r;
+    r.FromAngleAxis( Ogre::Radian(M_PI*0.5), Ogre::Vector3::UNIT_X );
+    ori = ori * r;
+  }
+
+  scene_node_->setOrientation( ori );
 
   Ogre::ColourValue bg_color = context_->getViewManager()->getRenderPanel()->getViewport()->getBackgroundColour();
 

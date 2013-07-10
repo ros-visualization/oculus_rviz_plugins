@@ -89,6 +89,7 @@ protected Q_SLOTS:
 private:
 
   rviz::BoolProperty *fullscreen_property_;
+  rviz::BoolProperty *horizontal_property_;
 
   rviz::RenderWidget *render_widget_;
   Ogre::SceneNode *scene_node_;
