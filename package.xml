@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>rviz_oculus</name>
+  <version>0.0.0</version>
+  <description>The rviz_oculus package</description>
+
+  <maintainer email="dgossow@willowgarage.com">dgossow</maintainer>
+
+  <license>BSD</license>
+
+  <!-- <url type="website">http://ros.org/wiki/rviz_oculus</url> -->
+
+  <author email="dgossow@willowgarage.com">dgossow</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rviz</build_depend>
+  <run_depend>rviz</run_depend>
+
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+
+  <export>
+      <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
+  
+</package>
