@@ -138,6 +138,7 @@ void OculusDisplay::onInitialize()
   Ogre::RenderWindow *window = render_widget_->getRenderWindow();
   window->setVisible(true);
   window->setAutoUpdated(true);
+  window->addListener(this);
 
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
 
@@ -155,6 +156,7 @@ void OculusDisplay::onInitialize()
 
 void OculusDisplay::preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 {
+  updateCamera();
 }
 
 void OculusDisplay::postRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
@@ -182,20 +184,26 @@ void OculusDisplay::onDisable()
 void OculusDisplay::update( float wall_dt, float ros_dt )
 {
   updateCamera();
-
-  Ogre::ColourValue bg_color = context_->getViewManager()->getRenderPanel()->getViewport()->getBackgroundColour();
-  oculus_->getViewport(0)->setBackgroundColour( bg_color );
-  // this is a hack to circumvent a bug in Ogre 1.8
-  // otherwise one of the viewports will not update it's background color
-  bg_color.g += 0.0001;
-  oculus_->getViewport(1)->setBackgroundColour( bg_color );
 }
 
 void OculusDisplay::updateCamera()
 {
   const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
   scene_node_->setPosition( cam->getDerivedPosition() );
+
   scene_node_->setOrientation( cam->getDerivedOrientation() );
+
+  Ogre::ColourValue bg_color = context_->getViewManager()->getRenderPanel()->getViewport()->getBackgroundColour();
+
+  for ( int i =0; i<2; i++ )
+  {
+    oculus_->getViewport(i)->setBackgroundColour( bg_color );
+
+    // this is a hack to circumvent a bug in Ogre 1.8
+    // otherwise one of the viewports will not update it's background color
+    bg_color.g += 0.0001;
+  }
+
   oculus_->update();
 }
 

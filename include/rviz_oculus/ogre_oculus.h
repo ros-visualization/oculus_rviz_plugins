@@ -75,10 +75,10 @@ public:
 	Ogre::CompositorInstance *getCompositor(unsigned int i);
 
 	/// Retrieve either of the two cameras.
-	Ogre::Camera *getCamera(unsigned int i);
+	Ogre::Camera *getCamera(unsigned int i) { return m_cameras[i%2]; }
 
 	/// Retrieve either of the two viewports.
-	Ogre::Viewport *getViewport(unsigned int i) { return m_viewports[i]; }
+	Ogre::Viewport *getViewport(unsigned int i) { return m_viewports[i%2]; }
 
 	/// Retrieve the projection centre offset.
 	float getCentreOffset() const;
