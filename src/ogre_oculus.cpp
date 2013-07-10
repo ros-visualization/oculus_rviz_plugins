@@ -235,12 +235,6 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Sc
 			m_cameras[i]->setPosition((i * 2 - 1) * m_stereoConfig->GetIPD() * 0.5f, 0, 0);
 			m_cameras[i]->setAspectRatio(m_stereoConfig->GetAspect());
 			m_cameras[i]->setFOVy(Ogre::Radian(m_stereoConfig->GetYFOVRadians()));
-			
-			// Oculus requires offset projection, create a custom projection matrix
-			Ogre::Matrix4 proj = Ogre::Matrix4::IDENTITY;
-			float temp = m_stereoConfig->GetProjectionCenterOffset();
-			proj.setTrans(Ogre::Vector3(-m_stereoConfig->GetProjectionCenterOffset() * (2 * i - 1), 0, 0));
-			m_cameras[i]->setCustomProjectionMatrix(true, proj * m_cameras[i]->getProjectionMatrix());
 		}
 		else
 		{
@@ -254,9 +248,26 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Sc
 		m_compositors[i]->setEnabled(true);
 	}
 
+	updateProjectionMatrices();
+
 	m_ogreReady = true;
 	Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
 	return true;
+}
+
+void Oculus::updateProjectionMatrices()
+{
+  if(m_stereoConfig)
+  {
+    for(int i=0;i<2;++i)
+    {
+      m_cameras[i]->setCustomProjectionMatrix(false);
+      Ogre::Matrix4 proj = Ogre::Matrix4::IDENTITY;
+      float temp = m_stereoConfig->GetProjectionCenterOffset();
+      proj.setTrans(Ogre::Vector3(-m_stereoConfig->GetProjectionCenterOffset() * (2 * i - 1), 0, 0));
+      m_cameras[i]->setCustomProjectionMatrix(true, proj * m_cameras[i]->getProjectionMatrix());
+    }
+  }
 }
 
 void Oculus::update()

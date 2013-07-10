@@ -85,6 +85,9 @@ public:
 
 	const OVR::HMDDevice *getHMDDevice() { return m_hmd; }
 
+	/// Re-create projection matrices based on camera parameters
+	void updateProjectionMatrices();
+
 protected:
 	OVR::DeviceManager *m_deviceManager;
 	OVR::HMDDevice *m_hmd;

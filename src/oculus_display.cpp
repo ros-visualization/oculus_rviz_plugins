@@ -198,12 +198,14 @@ void OculusDisplay::updateCamera()
   for ( int i =0; i<2; i++ )
   {
     oculus_->getViewport(i)->setBackgroundColour( bg_color );
+    oculus_->getCamera(i)->setNearClipDistance( cam->getNearClipDistance() );
 
     // this is a hack to circumvent a bug in Ogre 1.8
     // otherwise one of the viewports will not update it's background color
     bg_color.g += 0.0001;
   }
 
+  oculus_->updateProjectionMatrices();
   oculus_->update();
 }
 
