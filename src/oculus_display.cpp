@@ -41,9 +41,6 @@
 #include <OGRE/OgreRoot.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreRenderWindow.h>
-#include <OGRE/OgreCompositionPass.h>
-#include <OGRE/OgreCompositionTargetPass.h>
-#include <OGRE/OgreCompositorInstance.h>
 
 #include <ros/package.h>
 
@@ -187,18 +184,11 @@ void OculusDisplay::update( float wall_dt, float ros_dt )
   updateCamera();
 
   Ogre::ColourValue bg_color = context_->getViewManager()->getRenderPanel()->getViewport()->getBackgroundColour();
-  static int i = 0;
-  i++;
-
-  oculus_->getCompositor(0)->getTechnique()->getOutputTargetPass()->getPass(0)->setClearColour(bg_color);
   oculus_->getViewport(0)->setBackgroundColour( bg_color );
-  oculus_->getCompositor(1)->getTechnique()->getOutputTargetPass()->getPass(0)->setClearColour(bg_color);
+  // this is a hack to circumvent a bug in Ogre 1.8
+  // otherwise one of the viewports will not update it's background color
+  bg_color.g += 0.0001;
   oculus_->getViewport(1)->setBackgroundColour( bg_color );
-
-//  CompositorManager::getSingleton().getCompositorChain(oculus_->getViewport(0))->_getOriginalSceneCompositor()->getTechnique()->getOutputTargetPass()->getPass(0)->setClearColour(fadeColour);
-//  oculus_->getViewport(i%2)->setBackgroundColour( Ogre::ColourValue(0,0,0) );
-//  oculus_->getViewport(i%2)->setBackgroundColour( bg_color );
-//  oculus_->getViewport(i%2)->setClearEveryFrame(true);
 }
 
 void OculusDisplay::updateCamera()
