@@ -83,6 +83,8 @@ public:
 	/// Retrieve the projection centre offset.
 	float getCentreOffset() const;
 
+	const OVR::HMDDevice *getHMDDevice() { return m_hmd; }
+
 protected:
 	OVR::DeviceManager *m_deviceManager;
 	OVR::HMDDevice *m_hmd;

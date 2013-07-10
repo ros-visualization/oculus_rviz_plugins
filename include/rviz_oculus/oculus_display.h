@@ -42,6 +42,13 @@ class SceneNode;
 class RenderWindow;
 }
 
+namespace rviz
+{
+class BoolProperty;
+class StringProperty;
+class RenderWidget;
+}
+
 namespace rviz_oculus
 {
 
@@ -68,15 +75,22 @@ public:
   virtual void postRenderTargetUpdate( const Ogre::RenderTargetEvent& evt );
 
 protected:
-  // overrides from Display
+
   virtual void onEnable();
   virtual void onDisable();
 
   void updateCamera();
 
+protected Q_SLOTS:
+
+  void onFullScreenChanged();
+  void onScreenCountChanged( int newCount );
+
 private:
 
-  Ogre::RenderWindow *window_;
+  rviz::BoolProperty *fullscreen_property_;
+
+  rviz::RenderWidget *render_widget_;
   Ogre::SceneNode *scene_node_;
 
   Oculus *oculus_;
