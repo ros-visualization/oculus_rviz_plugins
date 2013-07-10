@@ -35,6 +35,5 @@ add_library(rviz_oculus
 
 target_link_libraries(rviz_oculus
   ${OCULUS_SDK_LIBRARIES}
-  -ludev -lpthread -lGL -lX11 -lXinerama
 )
 
