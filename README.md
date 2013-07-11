@@ -3,8 +3,8 @@ rviz_oculus
 
 Contains the Oculus Display for RViz. To build, you need the Oculus SDK.
 
-This plugin was developed using code from https://bitbucket.org/rajetic/ogreoculus 
-and https://github.com/bjornblissing/osgoculusviewer.
+This plugin is based on [OgreOculus](https://bitbucket.org/rajetic/ogreoculus) (C++)
+and [OsgOculusViewer](https://github.com/bjornblissing/osgoculusviewer) (GLSL shaders).
 
 Build Instructions
 ==================
