@@ -7,8 +7,8 @@ material Ogre/Compositor/Oculus
       depth_check off
 
       vertex_program_ref rviz_oculus/glsl120/warp.vert {}
-      fragment_program_ref rviz/glsl120/warp.frag {}
-//      fragment_program_ref rviz/glsl120/warpWithChromeAb.frag {}
+//      fragment_program_ref rviz/glsl120/warp.frag {}
+      fragment_program_ref rviz/glsl120/warpWithChromeAb.frag {}
       
       texture_unit RT
       {

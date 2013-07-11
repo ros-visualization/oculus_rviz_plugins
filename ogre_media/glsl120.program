@@ -29,21 +29,6 @@ fragment_program rviz/glsl120/warpWithChromeAb.frag glsl
     param_named Scale float2 0.3 0.3
     param_named ScaleIn float2 2.0 2.0
     param_named HmdWarpParam float4 1.0 0.22 0.24 0.0
+    param_named ChromAbParam float4 0.996, -0.004, 1.014, 0
   }
 }
-
-fragment_program Ogre/Compositor/OculusFP_cg cg
-{
-  source oculus.cg
-  entry_point main_fp
-  profiles ps_4_0 ps_2_0 arbfp1
-  
-  default_params
-  {
-    param_named LensCentre float2 0.5 0.5
-    param_named Scale float2 0.3 0.3
-    param_named ScaleIn float2 2 2
-    param_named HmdWarpParam float4 1.0f, 0.22f, 0.24f, 0
-  }
-}
-

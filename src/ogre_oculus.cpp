@@ -29,7 +29,8 @@ namespace
 	const float g_defaultIPD = 0.064f;
 	const Ogre::ColourValue g_defaultViewportColour(97/255.0f, 97/255.0f, 200/255.0f);
 	const float g_defaultProjectionCentreOffset = 0.14529906f;
-	const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
+    const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0.0f};
+    const float g_defaultChromAb[4] = {0.996, -0.004, 1.014, 0.0f};
 }
 
 namespace rviz_oculus
@@ -218,6 +219,19 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Sc
 	}
 	pParamsLeft->setNamedConstant("HmdWarpParam", hmdwarp);
 	pParamsRight->setNamedConstant("HmdWarpParam", hmdwarp);
+
+        Ogre::Vector4 hmdchrom;
+        if(m_stereoConfig)
+        {
+          hmdchrom = Ogre::Vector4( m_stereoConfig->GetHMDInfo().ChromaAbCorrection );
+        }
+        else
+        {
+          hmdchrom = Ogre::Vector4( g_defaultChromAb );
+        }
+        pParamsLeft->setNamedConstant("ChromAbParam", hmdchrom);
+        pParamsRight->setNamedConstant("ChromAbParam", hmdchrom);
+
 	pParamsLeft->setNamedConstant("LensCenter", 0.5f+(m_stereoConfig->GetProjectionCenterOffset()/2.0f));
 	pParamsRight->setNamedConstant("LensCenter", 0.5f-(m_stereoConfig->GetProjectionCenterOffset()/2.0f));
 
