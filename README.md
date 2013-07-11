@@ -15,6 +15,14 @@ If you have installed the SDK in your home folder, build using:
 catkin_make -DOCULUS_SDK_ROOT_DIR=~/OculusSDK/
 ```
 
+Usage Instructions
+==================
+
+In RViz, add the "OculusDisplay". This will create an additional window with the Oculus View
+rendered from the same point of view as the main rendering area. Check "Render to Oculus" to 
+render in full screen mode on your Oculus headset. It must be registered as secondary screen
+for this to work.
+
 This is how the Display should look in windowed mode:
 
 ![ScreenShot](doc/screenshot.png)
