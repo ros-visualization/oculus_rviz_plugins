@@ -23,6 +23,9 @@ rendered from the same point of view as the main rendering area. Check "Render t
 render in full screen mode on your Oculus headset. It must be registered as secondary screen
 for this to work.
 
+The Oculus view will be rendered from the same position as the main RViz camera while following
+your head's orientation.
+
 This is how the Display should look like in windowed mode:
 
 ![ScreenShot](doc/screenshot.png)
