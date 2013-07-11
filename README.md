@@ -23,6 +23,6 @@ rendered from the same point of view as the main rendering area. Check "Render t
 render in full screen mode on your Oculus headset. It must be registered as secondary screen
 for this to work.
 
-This is how the Display should look in windowed mode:
+This is how the Display should look like in windowed mode:
 
 ![ScreenShot](doc/screenshot.png)
