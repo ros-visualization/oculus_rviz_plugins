@@ -17,9 +17,12 @@ catkin_package(
   DEPENDS OculusSDK
 )
 
+pkg_check_modules(OGRE OGRE)
+
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${OCULUS_SDK_INCLUDE_DIRS}
+  ${OGRE_INCLUDE_DIRS}
 )
 
 # run Qt moc generator
