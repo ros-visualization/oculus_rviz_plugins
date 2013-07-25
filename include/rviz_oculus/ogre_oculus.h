@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "OgreQuaternion.h"
-#include "OgreVector3.h"
+#include "OGRE/OgreQuaternion.h"
+#include "OGRE/OgreVector3.h"
 
 
 namespace OVR
