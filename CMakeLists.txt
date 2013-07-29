@@ -17,6 +17,7 @@ catkin_package(
   DEPENDS OculusSDK
 )
 
+find_package(PkgConfig)
 pkg_check_modules(OGRE OGRE)
 
 include_directories(include
