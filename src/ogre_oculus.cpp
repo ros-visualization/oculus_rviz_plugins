@@ -46,7 +46,8 @@ Oculus::Oculus(void):m_sensorFusion(0),
 					 m_centreOffset(g_defaultProjectionCentreOffset),
 					 m_window(0),
 					 m_sceneManager(0),
-					 m_cameraNode(0)
+					 m_cameraNode(0),
+					 m_predicitonDt(0.03)
 {
 	for(int i=0;i<2;++i)
 	{
@@ -301,7 +302,15 @@ Ogre::Quaternion Oculus::getOrientation() const
 {
 	if(m_oculusReady)
 	{
-		Quatf q = m_sensorFusion->GetOrientation();
+          Quatf q;
+	  if ( m_predicitonDt > 0.0 )
+	  {
+            q = m_sensorFusion->GetPredictedOrientation(m_predicitonDt);
+	  }
+	  else
+	  {
+            q = m_sensorFusion->GetOrientation();
+	  }
 		return Ogre::Quaternion(q.w,q.x,q.y,q.z);
 	}
 	else
