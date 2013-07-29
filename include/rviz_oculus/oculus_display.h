@@ -47,6 +47,7 @@ namespace rviz
 class BoolProperty;
 class StringProperty;
 class RenderWidget;
+class FloatProperty;
 }
 
 namespace rviz_oculus
@@ -84,12 +85,14 @@ protected:
 protected Q_SLOTS:
 
   void onFullScreenChanged();
+  void onPredictionDtChanged();
   void onScreenCountChanged( int newCount );
 
 private:
 
   rviz::BoolProperty *fullscreen_property_;
   rviz::BoolProperty *horizontal_property_;
+  rviz::FloatProperty *prediction_dt_property_;
 
   rviz::RenderWidget *render_widget_;
   Ogre::SceneNode *scene_node_;

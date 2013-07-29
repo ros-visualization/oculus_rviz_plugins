@@ -96,10 +96,7 @@ public:
   void updateProjectionMatrices();
 
   /// Set motion prediction time window (0 to disable)
-  void setPredictionDt(float dt)
-  {
-    m_predicitonDt = dt;
-  }
+  void setPredictionDt(float dt);
 
 protected:
   OVR::DeviceManager *m_deviceManager;
@@ -117,7 +114,6 @@ protected:
   Ogre::Camera *m_cameras[2];
   Ogre::Viewport *m_viewports[2];
   Ogre::CompositorInstance *m_compositors[2];
-  float m_predicitonDt;
 };
 
 }

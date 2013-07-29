@@ -38,8 +38,7 @@ namespace rviz_oculus
 
 Oculus::Oculus(void) :
     m_sensorFusion(0), m_stereoConfig(0), m_hmd(0), m_deviceManager(0), m_oculusReady(false), m_ogreReady(false), m_sensor(
-        0), m_centreOffset(g_defaultProjectionCentreOffset), m_window(0), m_sceneManager(0), m_cameraNode(0), m_predicitonDt(
-        0.03)
+        0), m_centreOffset(g_defaultProjectionCentreOffset), m_window(0), m_sceneManager(0), m_cameraNode(0)
 {
   for (int i = 0; i < 2; ++i)
   {
@@ -57,8 +56,6 @@ Oculus::~Oculus(void)
 
 void Oculus::shutDownOculus()
 {
-  m_oculusReady = false;
-
   delete m_stereoConfig;
   m_stereoConfig = 0;
   delete m_sensorFusion;
@@ -79,6 +76,12 @@ void Oculus::shutDownOculus()
     m_deviceManager = 0;
   }
 
+  if ( m_oculusReady)
+  {
+
+  }
+
+  m_oculusReady = false;
   System::Destroy();
 }
 
@@ -289,19 +292,16 @@ Ogre::SceneNode *Oculus::getCameraNode()
   return m_cameraNode;
 }
 
+void Oculus::setPredictionDt(float dt)
+{
+  m_sensorFusion->SetPrediction( dt, dt > 0.0f );
+}
+
 Ogre::Quaternion Oculus::getOrientation() const
 {
   if (m_oculusReady)
   {
-    Quatf q;
-    if (m_predicitonDt > 0.0)
-    {
-      q = m_sensorFusion->GetPredictedOrientation(m_predicitonDt);
-    }
-    else
-    {
-      q = m_sensorFusion->GetOrientation();
-    }
+    Quatf q = m_sensorFusion->GetPredictedOrientation();
     return Ogre::Quaternion(q.w, q.x, q.y, q.z);
   }
   else

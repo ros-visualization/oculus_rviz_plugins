@@ -45,6 +45,8 @@
 #include <ros/package.h>
 
 #include <rviz/properties/bool_property.h>
+#include <rviz/properties/status_property.h>
+#include <rviz/properties/float_property.h>
 
 #include <rviz/window_manager_interface.h>
 #include <rviz/view_manager.h>
@@ -69,22 +71,31 @@ OculusDisplay::OculusDisplay()
   Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(ROS_PACKAGE_NAME);
 
   fullscreen_property_ = new rviz::BoolProperty( "Render to Oculus", false,
-    "",
+    "If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.",
     this, SLOT(onFullScreenChanged()));
 
-  horizontal_property_ = new rviz::BoolProperty( "Horizontal", true,
+  horizontal_property_ = new rviz::BoolProperty( "Fixed Horizon", true,
     "If checked, will ignore the pitch component of the RViz camera.", this);
+
+  prediction_dt_property_ = new rviz::FloatProperty( "Motion prediction (ms)", 30.0,
+                                                     "Time in ms to predict head motion. Decreases overall latency and motion sickness.",
+                                                     this, SLOT(onPredictionDtChanged()) );
 
   connect( QApplication::desktop(), SIGNAL( screenCountChanged ( int ) ), this, SLOT( onScreenCountChanged(int)) );
 }
 
 OculusDisplay::~OculusDisplay()
 {
-  oculus_->shutDownOculus();
-  oculus_->shutDownOgre();
-  render_widget_->close();
-
   delete oculus_;
+  render_widget_->close();
+}
+
+void OculusDisplay::onPredictionDtChanged( )
+{
+  if ( oculus_ )
+  {
+    oculus_->setPredictionDt( prediction_dt_property_->getFloat() * 0.001 );
+  }
 }
 
 
@@ -93,13 +104,13 @@ void OculusDisplay::onScreenCountChanged( int newCount )
   if ( newCount == 1 )
   {
     fullscreen_property_->setBool(false);
-    fullscreen_property_->setReadOnly(true);
-    fullscreen_property_->setDescription("No secondary screen detected. Cannot render to Oculus device.");
+    fullscreen_property_->setHidden(true);
+    setStatus( rviz::StatusProperty::Error, "Oculus Screen", "No secondary screen detected. Cannot render to Oculus device.");
   }
   else
   {
-    fullscreen_property_->setReadOnly(false);
-    fullscreen_property_->setDescription("If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.");
+    fullscreen_property_->setHidden(false);
+    setStatus( rviz::StatusProperty::Ok, "Oculus Screen", "Using screen #2.");
   }
 }
 
@@ -135,6 +146,7 @@ void OculusDisplay::onFullScreenChanged()
 void OculusDisplay::onInitialize()
 {
   render_widget_ = new rviz::RenderWidget( rviz::RenderSystem::get() );
+  render_widget_->setVisible(false);
   render_widget_->setWindowTitle( "Oculus View" );
 
   render_widget_->setParent( context_->getWindowManager()->getParentWindow() );
@@ -152,6 +164,7 @@ void OculusDisplay::onInitialize()
 
   onScreenCountChanged( QApplication::desktop()->numScreens() );
   onFullScreenChanged();
+  onPredictionDtChanged();
 
   oculus_->setupOgre( scene_manager_, window, scene_node_ );
 
@@ -170,16 +183,16 @@ void OculusDisplay::postRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 
 void OculusDisplay::onEnable()
 {
-  render_widget_->setVisible(true);
   if ( oculus_ )
   {
     oculus_->setupOculus();
+    render_widget_->setVisible( oculus_->isOculusReady() );
   }
 }
 
 void OculusDisplay::onDisable()
 {
-  render_widget_->close();
+  render_widget_->setVisible(false);
   if ( oculus_ )
   {
     oculus_->shutDownOculus();
@@ -193,6 +206,11 @@ void OculusDisplay::update( float wall_dt, float ros_dt )
 
 void OculusDisplay::updateCamera()
 {
+  if (!oculus_->isOculusReady())
+  {
+    return;
+  }
+
   const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
   scene_node_->setPosition( cam->getDerivedPosition() );
 
