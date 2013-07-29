@@ -11,37 +11,35 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 /// DEALINGS IN THE SOFTWARE.
 
-
 #pragma once
 
 #include "OGRE/OgreQuaternion.h"
 #include "OGRE/OgreVector3.h"
 
-
 namespace OVR
 {
-	class HMDDevice;
-	class SensorFusion;
-	class DeviceManager;
-	class SensorDevice;
+class HMDDevice;
+class SensorFusion;
+class DeviceManager;
+class SensorDevice;
 
-	namespace Util
-	{
-		namespace Render
-		{
-			class StereoConfig;
-		}
-	}
+namespace Util
+{
+namespace Render
+{
+class StereoConfig;
+}
+}
 }
 
 namespace Ogre
 {
-	class SceneManager;
-	class RenderWindow;
-	class Camera;
-	class SceneNode;
-	class Viewport;
-	class CompositorInstance;
+class SceneManager;
+class RenderWindow;
+class Camera;
+class SceneNode;
+class Viewport;
+class CompositorInstance;
 }
 
 namespace rviz_oculus
@@ -50,64 +48,76 @@ namespace rviz_oculus
 class Oculus
 {
 public:
-	Oculus(void);
-	~Oculus(void);
-	bool setupOculus();
-	bool setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::SceneNode *parent = 0);
-	void shutDownOculus();
-	void shutDownOgre();
-	bool isOgreReady() const;
-	bool isOculusReady() const;
+  Oculus(void);
+  ~Oculus(void);
+  bool setupOculus();
+  bool setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::SceneNode *parent = 0);
+  void shutDownOculus();
+  void shutDownOgre();
+  bool isOgreReady() const;
+  bool isOculusReady() const;
 
-	/// Update camera node using current Oculus orientation.
-	void update();
+  /// Update camera node using current Oculus orientation.
+  void update();
 
-	/// Reset orientation of the sensor.
-	void resetOrientation();
+  /// Reset orientation of the sensor.
+  void resetOrientation();
 
-	/// Retrieve the SceneNode that contains the two cameras used for stereo rendering.
-	Ogre::SceneNode *getCameraNode();
+  /// Retrieve the SceneNode that contains the two cameras used for stereo rendering.
+  Ogre::SceneNode *getCameraNode();
 
-	/// Retrieve the current orientation of the Oculus HMD.
-	Ogre::Quaternion getOrientation() const;
+  /// Retrieve the current orientation of the Oculus HMD.
+  Ogre::Quaternion getOrientation() const;
 
-	/// Retrieve either of the two distortion compositors.
-	Ogre::CompositorInstance *getCompositor(unsigned int i);
+  /// Retrieve either of the two distortion compositors.
+  Ogre::CompositorInstance *getCompositor(unsigned int i);
 
-	/// Retrieve either of the two cameras.
-	Ogre::Camera *getCamera(unsigned int i) { return m_cameras[i%2]; }
+  /// Retrieve either of the two cameras.
+  Ogre::Camera *getCamera(unsigned int i)
+  {
+    return m_cameras[i % 2];
+  }
 
-	/// Retrieve either of the two viewports.
-	Ogre::Viewport *getViewport(unsigned int i) { return m_viewports[i%2]; }
+  /// Retrieve either of the two viewports.
+  Ogre::Viewport *getViewport(unsigned int i)
+  {
+    return m_viewports[i % 2];
+  }
 
-	/// Retrieve the projection centre offset.
-	float getCentreOffset() const;
+  /// Retrieve the projection centre offset.
+  float getCentreOffset() const;
 
-	const OVR::HMDDevice *getHMDDevice() { return m_hmd; }
+  const OVR::HMDDevice *getHMDDevice()
+  {
+    return m_hmd;
+  }
 
-	/// Re-create projection matrices based on camera parameters
-	void updateProjectionMatrices();
+  /// Re-create projection matrices based on camera parameters
+  void updateProjectionMatrices();
 
-	/// Set motion prediction time window (0 to disable)
-	void setPredictionDt( float dt ) { m_predicitonDt = dt; }
+  /// Set motion prediction time window (0 to disable)
+  void setPredictionDt(float dt)
+  {
+    m_predicitonDt = dt;
+  }
 
 protected:
-	OVR::DeviceManager *m_deviceManager;
-	OVR::HMDDevice *m_hmd;
-	OVR::Util::Render::StereoConfig *m_stereoConfig;
-	OVR::SensorDevice *m_sensor;
-	OVR::SensorFusion *m_sensorFusion;
-	bool m_oculusReady;		/// Has the oculus rift been fully initialised?
-	bool m_ogreReady;		/// Has ogre been fully initialised?
-	Ogre::SceneManager *m_sceneManager;
-	Ogre::RenderWindow *m_window;
-	Ogre::SceneNode *m_cameraNode;
-	Ogre::Quaternion m_orientation;
-	float m_centreOffset;	/// Projection centre offset.
-	Ogre::Camera *m_cameras[2];
-	Ogre::Viewport *m_viewports[2];
-	Ogre::CompositorInstance *m_compositors[2];
-	float m_predicitonDt;
+  OVR::DeviceManager *m_deviceManager;
+  OVR::HMDDevice *m_hmd;
+  OVR::Util::Render::StereoConfig *m_stereoConfig;
+  OVR::SensorDevice *m_sensor;
+  OVR::SensorFusion *m_sensorFusion;
+  bool m_oculusReady; /// Has the oculus rift been fully initialised?
+  bool m_ogreReady; /// Has ogre been fully initialised?
+  Ogre::SceneManager *m_sceneManager;
+  Ogre::RenderWindow *m_window;
+  Ogre::SceneNode *m_cameraNode;
+  Ogre::Quaternion m_orientation;
+  float m_centreOffset; /// Projection centre offset.
+  Ogre::Camera *m_cameras[2];
+  Ogre::Viewport *m_viewports[2];
+  Ogre::CompositorInstance *m_compositors[2];
+  float m_predicitonDt;
 };
 
 }
