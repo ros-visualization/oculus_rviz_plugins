@@ -34,6 +34,8 @@
 
 #include <OGRE/OgreRenderTargetListener.h>
 
+#include <tf/transform_broadcaster.h>
+
 #include "rviz/display.h"
 
 namespace Ogre
@@ -86,6 +88,7 @@ protected Q_SLOTS:
 
   void onFullScreenChanged();
   void onPredictionDtChanged();
+
   void onScreenCountChanged( int newCount );
 
 private:
@@ -94,8 +97,13 @@ private:
   rviz::BoolProperty *horizontal_property_;
   rviz::FloatProperty *prediction_dt_property_;
 
+  rviz::BoolProperty *pub_tf_property_;
+  rviz::StringProperty *tf_frame_property_;
+
   rviz::RenderWidget *render_widget_;
   Ogre::SceneNode *scene_node_;
+
+  tf::TransformBroadcaster tf_pub_;
 
   Oculus *oculus_;
 };

@@ -47,6 +47,7 @@
 #include <rviz/properties/bool_property.h>
 #include <rviz/properties/status_property.h>
 #include <rviz/properties/float_property.h>
+#include <rviz/properties/string_property.h>
 
 #include <rviz/window_manager_interface.h>
 #include <rviz/view_manager.h>
@@ -77,9 +78,16 @@ OculusDisplay::OculusDisplay()
   horizontal_property_ = new rviz::BoolProperty( "Fixed Horizon", true,
     "If checked, will ignore the pitch component of the RViz camera.", this);
 
+  pub_tf_property_ = new rviz::BoolProperty( "Publish tf", true,
+    "If checked, will publish the pose of the Oculus camera as a tf frame.",
+    this );
+
+  tf_frame_property_ = new rviz::StringProperty( "Tf Frame", "oculus",
+    "Name of the tf frame.", this );
+
   prediction_dt_property_ = new rviz::FloatProperty( "Motion prediction (ms)", 30.0,
-                                                     "Time in ms to predict head motion. Decreases overall latency and motion sickness.",
-                                                     this, SLOT(onPredictionDtChanged()) );
+    "Time in ms to predict head motion. Decreases overall latency and motion sickness.",
+    this, SLOT(onPredictionDtChanged()) );
 
   connect( QApplication::desktop(), SIGNAL( screenCountChanged ( int ) ), this, SLOT( onScreenCountChanged(int)) );
 }
@@ -212,7 +220,8 @@ void OculusDisplay::updateCamera()
   }
 
   const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
-  scene_node_->setPosition( cam->getDerivedPosition() );
+  Ogre::Vector3 pos = cam->getDerivedPosition();
+  scene_node_->setPosition( pos );
 
   Ogre::Quaternion ori = cam->getDerivedOrientation();
 
@@ -221,7 +230,7 @@ void OculusDisplay::updateCamera()
     Ogre::Vector3 x_axis = ori * Ogre::Vector3(1,0,0);
     float yaw = atan2( x_axis.y, x_axis.x );// - M_PI*0.5;
 
-    // we're working in OpenGL corrdinates now
+    // we're working in OpenGL coordinates now
     ori.FromAngleAxis( Ogre::Radian(yaw), Ogre::Vector3::UNIT_Z );
 
     Ogre::Quaternion r;
@@ -245,6 +254,24 @@ void OculusDisplay::updateCamera()
 
   oculus_->updateProjectionMatrices();
   oculus_->update();
+
+  if ( pub_tf_property_->getBool() )
+  {
+    tf::StampedTransform pose;
+    pose.frame_id_ = context_->getFixedFrame().toStdString();
+    pose.child_frame_id_ = tf_frame_property_->getStdString();
+    pose.stamp_ = ros::Time::now();
+    ori = ori * oculus_->getOrientation();
+    Ogre::Quaternion r;
+    r.FromAngleAxis( Ogre::Radian(M_PI*0.5), Ogre::Vector3::UNIT_Y );
+    ori = ori * r;
+    r.FromAngleAxis( Ogre::Radian(-M_PI*0.5), Ogre::Vector3::UNIT_X );
+    ori = ori * r;
+    //Ogre::Matrix3
+    pose.setRotation( tf::Quaternion( ori.x, ori.y, ori.z, ori.w ) );
+    pose.setOrigin( tf::Vector3( pos.x, pos.y, pos.z ) );
+    tf_pub_.sendTransform( pose );
+  }
 }
 
 void OculusDisplay::reset()
