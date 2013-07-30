@@ -48,6 +48,8 @@
 #include <rviz/properties/status_property.h>
 #include <rviz/properties/float_property.h>
 #include <rviz/properties/string_property.h>
+#include <rviz/properties/tf_frame_property.h>
+#include <rviz/properties/vector_property.h>
 
 #include <rviz/window_manager_interface.h>
 #include <rviz/view_manager.h>
@@ -55,6 +57,7 @@
 #include <rviz/display_context.h>
 #include <rviz/ogre_helpers/render_widget.h>
 #include <rviz/ogre_helpers/render_system.h>
+#include <rviz/frame_manager.h>
 
 #include "rviz_oculus/oculus_display.h"
 #include "rviz_oculus/ogre_oculus.h"
@@ -71,24 +74,6 @@ OculusDisplay::OculusDisplay()
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media", "FileSystem", ROS_PACKAGE_NAME );
   Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(ROS_PACKAGE_NAME);
 
-  fullscreen_property_ = new rviz::BoolProperty( "Render to Oculus", false,
-    "If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.",
-    this, SLOT(onFullScreenChanged()));
-
-  horizontal_property_ = new rviz::BoolProperty( "Fixed Horizon", true,
-    "If checked, will ignore the pitch component of the RViz camera.", this);
-
-  pub_tf_property_ = new rviz::BoolProperty( "Publish tf", true,
-    "If checked, will publish the pose of the Oculus camera as a tf frame.",
-    this );
-
-  tf_frame_property_ = new rviz::StringProperty( "Tf Frame", "oculus",
-    "Name of the tf frame.", this );
-
-  prediction_dt_property_ = new rviz::FloatProperty( "Motion prediction (ms)", 30.0,
-    "Time in ms to predict head motion. Decreases overall latency and motion sickness.",
-    this, SLOT(onPredictionDtChanged()) );
-
   connect( QApplication::desktop(), SIGNAL( screenCountChanged ( int ) ), this, SLOT( onScreenCountChanged(int)) );
 }
 
@@ -96,6 +81,78 @@ OculusDisplay::~OculusDisplay()
 {
   delete oculus_;
   render_widget_->close();
+}
+
+
+void OculusDisplay::onInitialize()
+{
+  fullscreen_property_ = new rviz::BoolProperty( "Render to Oculus", false,
+    "If checked, will render fullscreen on your secondary screen. Otherwise, shows a window.",
+    this, SLOT(onFullScreenChanged()));
+
+  prediction_dt_property_ = new rviz::FloatProperty( "Motion prediction (ms)", 30.0,
+    "Time in ms to predict head motion. Decreases overall latency and motion sickness.",
+    this, SLOT(onPredictionDtChanged()) );
+
+  near_clip_property_ = new rviz::FloatProperty( "Near Clip Distance", 0.02,
+    "Minimum rendering distance for Oculus camera.",
+    this );
+
+  horizontal_property_ = new rviz::BoolProperty( "Fixed Horizon", true,
+    "If checked, will ignore the pitch component of the RViz camera.", this);
+
+  follow_cam_property_ = new rviz::BoolProperty( "Follow RViz Camera", true,
+    "If checked, will set the Oculus camera to the same position as the main view camera.",
+    this, SLOT( onFollowCamChanged() ) );
+
+  tf_frame_property_ = new rviz::TfFrameProperty( "Target Frame", "<Fixed Frame>",
+    "Tf frame that the Oculus camera should follow.", this, context_->getFrameManager(), true );
+
+  offset_property_ = new rviz::VectorProperty( "Offset", Ogre::Vector3(0,0,0),
+    "Additional offset of the Oculus camera from the followed RViz camera or target frame.", this );
+
+  pub_tf_property_ = new rviz::BoolProperty( "Publish tf", true,
+    "If checked, will publish the pose of the Oculus camera as a tf frame.",
+    this, SLOT( onPubTfChanged() ) );
+
+  pub_tf_frame_property_ = new rviz::StringProperty( "Tf Frame", "oculus",
+    "Name of the published tf frame.", this );
+
+  render_widget_ = new rviz::RenderWidget( rviz::RenderSystem::get() );
+  render_widget_->setVisible(false);
+  render_widget_->setWindowTitle( "Oculus View" );
+
+  render_widget_->setParent( context_->getWindowManager()->getParentWindow() );
+  render_widget_->setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint );
+
+  Ogre::RenderWindow *window = render_widget_->getRenderWindow();
+  window->setVisible(true);
+  window->setAutoUpdated(true);
+  window->addListener(this);
+
+  scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
+
+  oculus_ = new Oculus();
+  onEnable();
+
+  onScreenCountChanged( QApplication::desktop()->numScreens() );
+  onFullScreenChanged();
+  onPredictionDtChanged();
+
+  oculus_->setupOgre( scene_manager_, window, scene_node_ );
+
+  update(0,0);
+}
+
+
+void OculusDisplay::onFollowCamChanged()
+{
+  tf_frame_property_->setHidden( follow_cam_property_->getBool() );
+}
+
+void OculusDisplay::onPubTfChanged()
+{
+  pub_tf_frame_property_->setHidden( !pub_tf_property_->getBool() );
 }
 
 void OculusDisplay::onPredictionDtChanged( )
@@ -151,35 +208,6 @@ void OculusDisplay::onFullScreenChanged()
   }
 }
 
-void OculusDisplay::onInitialize()
-{
-  render_widget_ = new rviz::RenderWidget( rviz::RenderSystem::get() );
-  render_widget_->setVisible(false);
-  render_widget_->setWindowTitle( "Oculus View" );
-
-  render_widget_->setParent( context_->getWindowManager()->getParentWindow() );
-  render_widget_->setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint );
-
-  Ogre::RenderWindow *window = render_widget_->getRenderWindow();
-  window->setVisible(true);
-  window->setAutoUpdated(true);
-  window->addListener(this);
-
-  scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-
-  oculus_ = new Oculus();
-  onEnable();
-
-  onScreenCountChanged( QApplication::desktop()->numScreens() );
-  onFullScreenChanged();
-  onPredictionDtChanged();
-
-  oculus_->setupOgre( scene_manager_, window, scene_node_ );
-
-  update(0,0);
-}
-
-
 void OculusDisplay::preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 {
   updateCamera();
@@ -219,11 +247,31 @@ void OculusDisplay::updateCamera()
     return;
   }
 
-  const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
-  Ogre::Vector3 pos = cam->getDerivedPosition();
+  Ogre::Vector3 pos;
+  Ogre::Quaternion ori;
+
+
+  if ( follow_cam_property_->getBool() )
+  {
+    const Ogre::Camera *cam = context_->getViewManager()->getCurrent()->getCamera();
+    pos = cam->getDerivedPosition();
+    ori = cam->getDerivedOrientation();
+  }
+  else
+  {
+    context_->getFrameManager()->getTransform( tf_frame_property_->getStdString(),
+                                               ros::Time(), pos, ori );
+    Ogre::Quaternion r;
+    r.FromAngleAxis( Ogre::Radian(M_PI*0.5), Ogre::Vector3::UNIT_X );
+    ori = ori * r;
+    r.FromAngleAxis( Ogre::Radian(-M_PI*0.5), Ogre::Vector3::UNIT_Y );
+    ori = ori * r;
+  }
+
+  pos += offset_property_->getVector();
+
   scene_node_->setPosition( pos );
 
-  Ogre::Quaternion ori = cam->getDerivedOrientation();
 
   if ( horizontal_property_->getBool() )
   {
@@ -245,7 +293,7 @@ void OculusDisplay::updateCamera()
   for ( int i =0; i<2; i++ )
   {
     oculus_->getViewport(i)->setBackgroundColour( bg_color );
-    oculus_->getCamera(i)->setNearClipDistance( cam->getNearClipDistance() );
+    oculus_->getCamera(i)->setNearClipDistance( near_clip_property_->getFloat() );
 
     // this is a hack to circumvent a bug in Ogre 1.8
     // otherwise one of the viewports will not update it's background color
@@ -259,7 +307,7 @@ void OculusDisplay::updateCamera()
   {
     tf::StampedTransform pose;
     pose.frame_id_ = context_->getFixedFrame().toStdString();
-    pose.child_frame_id_ = tf_frame_property_->getStdString();
+    pose.child_frame_id_ = pub_tf_frame_property_->getStdString();
     pose.stamp_ = ros::Time::now();
     ori = ori * oculus_->getOrientation();
     Ogre::Quaternion r;

@@ -50,6 +50,8 @@ class BoolProperty;
 class StringProperty;
 class RenderWidget;
 class FloatProperty;
+class VectorProperty;
+class TfFrameProperty;
 }
 
 namespace rviz_oculus
@@ -88,17 +90,25 @@ protected Q_SLOTS:
 
   void onFullScreenChanged();
   void onPredictionDtChanged();
+  void onPubTfChanged();
+  void onFollowCamChanged();
 
   void onScreenCountChanged( int newCount );
 
 private:
 
   rviz::BoolProperty *fullscreen_property_;
-  rviz::BoolProperty *horizontal_property_;
   rviz::FloatProperty *prediction_dt_property_;
 
   rviz::BoolProperty *pub_tf_property_;
-  rviz::StringProperty *tf_frame_property_;
+  rviz::StringProperty *pub_tf_frame_property_;
+
+  rviz::BoolProperty *follow_cam_property_;
+  rviz::BoolProperty *horizontal_property_;
+  rviz::TfFrameProperty *tf_frame_property_;
+  rviz::VectorProperty *offset_property_;
+
+  rviz::FloatProperty *near_clip_property_;
 
   rviz::RenderWidget *render_widget_;
   Ogre::SceneNode *scene_node_;
