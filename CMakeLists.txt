@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp)
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 FIND_PACKAGE( OculusSDK REQUIRED )
 
+link_directories(${OculusSDK_LIBRARY_DIRS})
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rviz_oculus
@@ -22,7 +24,7 @@ pkg_check_modules(OGRE OGRE)
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
-  ${OCULUS_SDK_INCLUDE_DIRS}
+  ${OculusSDK_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
 )
 
@@ -40,6 +42,6 @@ add_library(rviz_oculus
 )
 
 target_link_libraries(rviz_oculus
-  ${OCULUS_SDK_LIBRARIES}
+  ${OculusSDK_LIBRARIES}
 )
 
