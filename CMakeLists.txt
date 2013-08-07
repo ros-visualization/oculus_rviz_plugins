@@ -31,11 +31,13 @@ include_directories(include
 # run Qt moc generator
 qt4_wrap_cpp(MOC_FILES
   include/rviz_oculus/oculus_display.h
+  include/rviz_oculus/fixed_view_controller.h
 )
 
 add_library(rviz_oculus
   src/ogre_oculus.cpp
   src/oculus_display.cpp
+  src/fixed_view_controller.cpp
   ${MOC_FILES}
 )
 

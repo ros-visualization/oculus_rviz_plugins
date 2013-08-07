@@ -238,6 +238,15 @@ void OculusDisplay::onDisable()
 void OculusDisplay::update( float wall_dt, float ros_dt )
 {
   updateCamera();
+
+  if ( oculus_->isMagCalibrated() )
+  {
+    setStatus( rviz::StatusProperty::Ok, "Magnetometer", "Magnetometer calibrated.");
+  }
+  else
+  {
+    setStatus( rviz::StatusProperty::Warn, "Magnetometer", "Magnetometer not calibrated. Look left/right/up/down to collect enough samples.");
+  }
 }
 
 void OculusDisplay::updateCamera()

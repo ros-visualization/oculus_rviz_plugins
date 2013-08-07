@@ -3,7 +3,14 @@
          type="rviz_oculus::OculusDisplay"
          base_class_type="rviz::Display">
     <description>
-      Renders the main rviz view to the Oculus Rift.
+      Renders the rviz scene to the Oculus Rift.
+    </description>
+  </class>
+  <class name="rviz_oculus/FixedFrame"
+         type="rviz_oculus::FixedViewController"
+         base_class_type="rviz::ViewController">
+    <description>
+      Renders the main rviz view from the origin of a particular tf frame.
     </description>
   </class>
 </library>

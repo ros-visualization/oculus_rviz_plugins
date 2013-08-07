@@ -161,6 +161,7 @@ bool Oculus::setupOculus()
   HMDInfo devinfo;
   m_hmd->GetDeviceInfo(&devinfo);
   m_stereoConfig->SetHMDInfo(devinfo);
+
   m_sensor = m_hmd->GetSensor();
   if (!m_sensor)
   {
@@ -168,14 +169,15 @@ bool Oculus::setupOculus()
     return false;
   }
   Ogre::LogManager::getSingleton().logMessage("Oculus: Created sensor");
+
   m_sensorFusion = new SensorFusion();
-  if (!m_sensorFusion)
-  {
-    Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create SensorFusion");
-    return false;
-  }
-  Ogre::LogManager::getSingleton().logMessage("Oculus: Created SensorFusion");
   m_sensorFusion->AttachToSensor(m_sensor);
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created SensorFusion");
+
+  m_magCalibration = new Util::MagCalibration();
+  m_magCalibration->BeginAutoCalibration( *m_sensorFusion );
+  Ogre::LogManager::getSingleton().logMessage("Oculus: Created MagCalibration");
+
   m_oculusReady = true;
   Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
   return true;
@@ -284,10 +286,24 @@ void Oculus::update()
   if (m_ogreReady)
   {
     m_cameraNode->setOrientation(getOrientation());
+
+    if (m_magCalibration->IsAutoCalibrating())
+    {
+      m_magCalibration->UpdateAutoCalibration( *m_sensorFusion );
+      if (m_magCalibration->IsCalibrated())
+      {
+        m_sensorFusion->SetYawCorrectionEnabled(true);
+      }
+    }
   }
 }
 
-Ogre::SceneNode *Oculus::getCameraNode()
+bool Oculus::isMagCalibrated()
+{
+  return m_magCalibration->IsCalibrated();
+}
+
+Ogre::SceneNode* Oculus::getCameraNode()
 {
   return m_cameraNode;
 }
