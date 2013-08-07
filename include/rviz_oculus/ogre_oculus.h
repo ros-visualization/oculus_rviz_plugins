@@ -16,6 +16,8 @@
 #include "OGRE/OgreQuaternion.h"
 #include "OGRE/OgreVector3.h"
 
+#include <string>
+
 namespace OVR
 {
 class HMDDevice;
@@ -25,6 +27,7 @@ class SensorDevice;
 
 namespace Util
 {
+class MagCalibration;
 namespace Render
 {
 class StereoConfig;
@@ -98,10 +101,14 @@ public:
   /// Set motion prediction time window (0 to disable)
   void setPredictionDt(float dt);
 
+  /// Get status of mag calibration
+  bool isMagCalibrated();
+
 protected:
   OVR::DeviceManager *m_deviceManager;
   OVR::HMDDevice *m_hmd;
   OVR::Util::Render::StereoConfig *m_stereoConfig;
+  OVR::Util::MagCalibration *m_magCalibration;
   OVR::SensorDevice *m_sensor;
   OVR::SensorFusion *m_sensorFusion;
   bool m_oculusReady; /// Has the oculus rift been fully initialised?
