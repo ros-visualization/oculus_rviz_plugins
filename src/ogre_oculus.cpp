@@ -300,7 +300,7 @@ void Oculus::update()
 
 bool Oculus::isMagCalibrated()
 {
-  return m_magCalibration->IsCalibrated();
+  return m_oculusReady && m_magCalibration->IsCalibrated();
 }
 
 Ogre::SceneNode* Oculus::getCameraNode()
@@ -310,7 +310,10 @@ Ogre::SceneNode* Oculus::getCameraNode()
 
 void Oculus::setPredictionDt(float dt)
 {
-  m_sensorFusion->SetPrediction( dt, dt > 0.0f );
+  if (m_oculusReady)
+  {
+    m_sensorFusion->SetPrediction( dt, dt > 0.0f );
+  }
 }
 
 Ogre::Quaternion Oculus::getOrientation() const

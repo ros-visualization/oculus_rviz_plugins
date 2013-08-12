@@ -68,7 +68,6 @@ namespace rviz_oculus
 OculusDisplay::OculusDisplay()
 : render_widget_(0)
 , scene_node_(0)
-, oculus_(0)
 {
   std::string rviz_path = ros::package::getPath(ROS_PACKAGE_NAME);
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media", "FileSystem", ROS_PACKAGE_NAME );
@@ -79,7 +78,7 @@ OculusDisplay::OculusDisplay()
 
 OculusDisplay::~OculusDisplay()
 {
-  delete oculus_;
+  oculus_.reset();
   render_widget_->close();
 }
 
@@ -126,22 +125,11 @@ void OculusDisplay::onInitialize()
   render_widget_->setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint );
 
   Ogre::RenderWindow *window = render_widget_->getRenderWindow();
-  window->setVisible(true);
+  window->setVisible(false);
   window->setAutoUpdated(true);
   window->addListener(this);
 
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-
-  oculus_ = new Oculus();
-  onEnable();
-
-  onScreenCountChanged( QApplication::desktop()->numScreens() );
-  onFullScreenChanged();
-  onPredictionDtChanged();
-
-  oculus_->setupOgre( scene_manager_, window, scene_node_ );
-
-  update(0,0);
 }
 
 
@@ -157,10 +145,12 @@ void OculusDisplay::onPubTfChanged()
 
 void OculusDisplay::onPredictionDtChanged( )
 {
-  if ( oculus_ )
+  if ( !oculus_ || !isEnabled() )
   {
-    oculus_->setPredictionDt( prediction_dt_property_->getFloat() * 0.001 );
+    return;
   }
+
+  oculus_->setPredictionDt( prediction_dt_property_->getFloat() * 0.001 );
 }
 
 
@@ -170,18 +160,23 @@ void OculusDisplay::onScreenCountChanged( int newCount )
   {
     fullscreen_property_->setBool(false);
     fullscreen_property_->setHidden(true);
-    setStatus( rviz::StatusProperty::Error, "Oculus Screen", "No secondary screen detected. Cannot render to Oculus device.");
+    setStatus( rviz::StatusProperty::Error, "Screen", "No secondary screen detected. Cannot render to Oculus device.");
   }
   else
   {
     fullscreen_property_->setHidden(false);
-    setStatus( rviz::StatusProperty::Ok, "Oculus Screen", "Using screen #2.");
+    setStatus( rviz::StatusProperty::Ok, "Screen", "Using screen #2.");
   }
 }
 
 
 void OculusDisplay::onFullScreenChanged()
 {
+  if ( !oculus_ || !isEnabled() )
+  {
+    return;
+  }
+
   if ( fullscreen_property_->getBool() && QApplication::desktop()->numScreens() > 1 )
   {
     QRect screen_res = QApplication::desktop()->screenGeometry(1);
@@ -194,7 +189,7 @@ void OculusDisplay::onFullScreenChanged()
   {
     int x_res = 1280;
     int y_res = 800;
-    if ( oculus_ )
+    if ( oculus_->getHMDDevice() )
     {
       OVR::HMDInfo info;
       oculus_->getHMDDevice()->GetDeviceInfo( &info );
@@ -210,34 +205,73 @@ void OculusDisplay::onFullScreenChanged()
 
 void OculusDisplay::preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 {
+  if ( !oculus_ )
+  {
+    return;
+  }
   updateCamera();
 }
 
 void OculusDisplay::postRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 {
+  if ( !oculus_ )
+  {
+    return;
+  }
+  Ogre::RenderWindow *window = render_widget_->getRenderWindow();
+  window->swapBuffers(true);
 }
 
 void OculusDisplay::onEnable()
 {
   if ( oculus_ )
   {
-    oculus_->setupOculus();
-    render_widget_->setVisible( oculus_->isOculusReady() );
+     return;
   }
+
+  oculus_.reset( new Oculus() );
+  oculus_->setupOculus();
+
+  if ( !oculus_->isOculusReady() )
+  {
+    oculus_.reset();
+    setStatusStd( rviz::StatusProperty::Error, "Oculus", "No Oculus device found!" );
+    return;
+  }
+
+  setStatusStd( rviz::StatusProperty::Ok, "Oculus", "Oculus is ready." );
+
+  Ogre::RenderWindow *window = render_widget_->getRenderWindow();
+  oculus_->setupOgre( scene_manager_, window, scene_node_ );
+
+  render_widget_->setVisible( oculus_->isOculusReady() );
+  window->setAutoUpdated(true);
+
+  onScreenCountChanged( QApplication::desktop()->numScreens() );
+  onFullScreenChanged();
+  onPredictionDtChanged();
 }
 
 void OculusDisplay::onDisable()
 {
+  clearStatuses();
   render_widget_->setVisible(false);
   if ( oculus_ )
   {
-    oculus_->shutDownOculus();
+    oculus_.reset();
   }
 }
 
 void OculusDisplay::update( float wall_dt, float ros_dt )
 {
+  if ( !oculus_ )
+  {
+    return;
+  }
+
   updateCamera();
+  Ogre::RenderWindow *window = render_widget_->getRenderWindow();
+  window->update(false);
 
   if ( oculus_->isMagCalibrated() )
   {
@@ -251,7 +285,7 @@ void OculusDisplay::update( float wall_dt, float ros_dt )
 
 void OculusDisplay::updateCamera()
 {
-  if (!oculus_->isOculusReady())
+  if (!oculus_ || !oculus_->isOculusReady())
   {
     return;
   }
@@ -334,6 +368,11 @@ void OculusDisplay::updateCamera()
 void OculusDisplay::reset()
 {
   rviz::Display::reset();
+  if ( oculus_ )
+  {
+    onDisable();
+    onEnable();
+  }
 }
 
 } // namespace rviz
