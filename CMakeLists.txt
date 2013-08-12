@@ -1,16 +1,24 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(rviz_oculus)
 
+# Qt
 find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(-DQT_NO_KEYWORDS -fPIC)
 
-find_package(catkin REQUIRED COMPONENTS rviz roscpp)
+# Catkin
+find_package(catkin REQUIRED COMPONENTS 
+  rviz
+  roscpp
+  tf
+)
 
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# Oculus SDK
 FIND_PACKAGE( OculusSDK REQUIRED )
-
 link_directories(${OculusSDK_LIBRARY_DIRS})
+
+# Boost
+find_package(Boost REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -26,6 +34,7 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${OculusSDK_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
+  ${BOOST_INCLUDE_DIRS}
 )
 
 # run Qt moc generator
@@ -43,6 +52,7 @@ add_library(rviz_oculus
 
 target_link_libraries(rviz_oculus
   ${OculusSDK_LIBRARIES}
+  ${BOOST_LIBRARIES}
 )
 
 
