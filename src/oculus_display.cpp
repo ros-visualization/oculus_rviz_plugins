@@ -80,7 +80,7 @@ OculusDisplay::OculusDisplay()
 OculusDisplay::~OculusDisplay()
 {
   delete oculus_;
-  render_widget_->close();
+  delete render_widget_;
 }
 
 
