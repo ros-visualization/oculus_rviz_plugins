@@ -126,7 +126,7 @@ void OculusDisplay::onInitialize()
 
   Ogre::RenderWindow *window = render_widget_->getRenderWindow();
   window->setVisible(false);
-  window->setAutoUpdated(true);
+  window->setAutoUpdated(false);
   window->addListener(this);
 
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
@@ -245,7 +245,6 @@ void OculusDisplay::onEnable()
   oculus_->setupOgre( scene_manager_, window, scene_node_ );
 
   render_widget_->setVisible( oculus_->isOculusReady() );
-  window->setAutoUpdated(true);
 
   onScreenCountChanged( QApplication::desktop()->numScreens() );
   onFullScreenChanged();
