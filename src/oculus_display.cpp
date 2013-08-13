@@ -79,7 +79,7 @@ OculusDisplay::OculusDisplay()
 OculusDisplay::~OculusDisplay()
 {
   oculus_.reset();
-  render_widget_->close();
+  delete render_widget_;
 }
 
 
