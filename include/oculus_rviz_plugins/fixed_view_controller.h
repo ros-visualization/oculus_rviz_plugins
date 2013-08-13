@@ -41,7 +41,7 @@ namespace rviz
 class FloatProperty;
 }
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 class FixedViewController: public rviz::FramePositionTrackingViewController

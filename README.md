@@ -1,4 +1,4 @@
-rviz_oculus
+oculus_rviz_plugins
 ===========
 
 Contains the Oculus Display for RViz. To build it, you will need the [Oculus SDK for Linux 0.2.3](http://developer.oculusvr.com).

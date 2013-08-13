@@ -59,10 +59,10 @@
 #include <rviz/ogre_helpers/render_system.h>
 #include <rviz/frame_manager.h>
 
-#include "rviz_oculus/oculus_display.h"
-#include "rviz_oculus/ogre_oculus.h"
+#include "oculus_rviz_plugins/oculus_display.h"
+#include "oculus_rviz_plugins/ogre_oculus.h"
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 OculusDisplay::OculusDisplay()
@@ -377,4 +377,4 @@ void OculusDisplay::reset()
 } // namespace rviz
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS( rviz_oculus::OculusDisplay, rviz::Display )
+PLUGINLIB_EXPORT_CLASS( oculus_rviz_plugins::OculusDisplay, rviz::Display )

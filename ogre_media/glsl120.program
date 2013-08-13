@@ -1,5 +1,5 @@
 
-vertex_program rviz_oculus/glsl120/warp.vert glsl
+vertex_program oculus_rviz_plugins/glsl120/warp.vert glsl
 {
   source warp.vert
 }

@@ -45,7 +45,7 @@ class Viewport;
 class CompositorInstance;
 }
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 class Oculus

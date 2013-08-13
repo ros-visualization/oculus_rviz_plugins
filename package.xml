@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>rviz_oculus</name>
+  <name>oculus_rviz_plugins</name>
   <version>0.0.1</version>
   <description>RViz plugins for the Oculus Rift.</description>
 

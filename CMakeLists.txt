@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rviz_oculus)
+project(oculus_rviz_plugins)
 
 # Qt
 find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
@@ -22,7 +22,7 @@ find_package(Boost REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES rviz_oculus
+  LIBRARIES oculus_rviz_plugins
   CATKIN_DEPENDS rviz
   DEPENDS OculusSDK
 )
@@ -39,18 +39,18 @@ include_directories(include
 
 # run Qt moc generator
 qt4_wrap_cpp(MOC_FILES
-  include/rviz_oculus/oculus_display.h
-  include/rviz_oculus/fixed_view_controller.h
+  include/oculus_rviz_plugins/oculus_display.h
+  include/oculus_rviz_plugins/fixed_view_controller.h
 )
 
-add_library(rviz_oculus
+add_library(oculus_rviz_plugins
   src/ogre_oculus.cpp
   src/oculus_display.cpp
   src/fixed_view_controller.cpp
   ${MOC_FILES}
 )
 
-target_link_libraries(rviz_oculus
+target_link_libraries(oculus_rviz_plugins
   ${OculusSDK_LIBRARIES}
   ${BOOST_LIBRARIES}
 )
@@ -60,7 +60,7 @@ target_link_libraries(rviz_oculus
 ## Install ##
 #############
 
-install(TARGETS rviz_oculus
+install(TARGETS oculus_rviz_plugins
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

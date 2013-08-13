@@ -46,11 +46,11 @@
 #include "rviz/load_resource.h"
 #include "rviz/render_panel.h"
 
-#include "rviz_oculus/fixed_view_controller.h"
+#include "oculus_rviz_plugins/fixed_view_controller.h"
 
 using namespace rviz;
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 static const Ogre::Quaternion ROBOT_TO_CAMERA_ROTATION =
@@ -116,4 +116,4 @@ void FixedViewController::zoom( float amount )
 } // end namespace rviz
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS( rviz_oculus::FixedViewController, rviz::ViewController )
+PLUGINLIB_EXPORT_CLASS( oculus_rviz_plugins::FixedViewController, rviz::ViewController )

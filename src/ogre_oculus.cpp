@@ -11,7 +11,7 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 /// DEALINGS IN THE SOFTWARE.
 
-#include "rviz_oculus/ogre_oculus.h"
+#include "oculus_rviz_plugins/ogre_oculus.h"
 #include "OVR.h"
 #include "OGRE/OgreSceneManager.h"
 #include "OGRE/OgreRenderWindow.h"
@@ -33,7 +33,7 @@ const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0.0f};
 const float g_defaultChromAb[4] = {0.996, -0.004, 1.014, 0.0f};
 }
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 Oculus::Oculus(void) :

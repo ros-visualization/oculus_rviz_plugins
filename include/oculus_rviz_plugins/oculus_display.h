@@ -56,7 +56,7 @@ class VectorProperty;
 class TfFrameProperty;
 }
 
-namespace rviz_oculus
+namespace oculus_rviz_plugins
 {
 
 class Oculus;
