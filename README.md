@@ -6,15 +6,6 @@ Contains the Oculus Display for RViz. To build it, you will need the [Oculus SDK
 This plugin is based on [OgreOculus](https://bitbucket.org/rajetic/ogreoculus) (C++)
 and [OsgOculusViewer](https://github.com/bjornblissing/osgoculusviewer) (GLSL shaders).
 
-Build Instructions
-==================
-
-If you have installed the SDK in your home folder, build using:
-
-```
-catkin_make -DOCULUS_SDK_ROOT_DIR=~/OculusSDK/
-```
-
 Usage Instructions
 ==================
 
@@ -23,8 +14,8 @@ rendered from the same point of view as the main rendering area. Check "Render t
 render in full screen mode on your Oculus headset. It must be registered as secondary screen
 for this to work.
 
-The Oculus view will be rendered from the same position as the main RViz camera while following
-your head's orientation.
+By default, the Oculus view will be rendered from the same position as the main RViz camera while following
+your head's orientation. Alternatively, you can attach the camera to a tf frame.
 
 This is how the Display should look like in windowed mode:
 
