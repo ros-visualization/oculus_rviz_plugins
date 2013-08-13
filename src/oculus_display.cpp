@@ -68,6 +68,7 @@ namespace oculus_rviz_plugins
 OculusDisplay::OculusDisplay()
 : render_widget_(0)
 , scene_node_(0)
+, oculus_(0)
 {
   std::string rviz_path = ros::package::getPath(ROS_PACKAGE_NAME);
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( rviz_path + "/ogre_media", "FileSystem", ROS_PACKAGE_NAME );
@@ -78,7 +79,7 @@ OculusDisplay::OculusDisplay()
 
 OculusDisplay::~OculusDisplay()
 {
-  oculus_.reset();
+  delete oculus_;
   render_widget_->close();
 }
 
@@ -229,12 +230,13 @@ void OculusDisplay::onEnable()
      return;
   }
 
-  oculus_.reset( new Oculus() );
+  oculus_ = new Oculus();
   oculus_->setupOculus();
 
   if ( !oculus_->isOculusReady() )
   {
-    oculus_.reset();
+    delete oculus_;
+    oculus_ = 0;
     setStatusStd( rviz::StatusProperty::Error, "Oculus", "No Oculus device found!" );
     return;
   }
@@ -257,7 +259,8 @@ void OculusDisplay::onDisable()
   render_widget_->setVisible(false);
   if ( oculus_ )
   {
-    oculus_.reset();
+    delete oculus_;
+    oculus_ = 0;
   }
 }
 
