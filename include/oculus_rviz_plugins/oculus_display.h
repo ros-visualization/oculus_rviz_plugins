@@ -30,7 +30,9 @@
 #ifndef RVIZ_OCULUS_DISPLAY_H
 #define RVIZ_OCULUS_DISPLAY_H
 
+#ifndef Q_MOC_RUN
 #include <boost/shared_ptr.hpp>
+#endif
 
 #include <QObject>
 
@@ -117,9 +119,12 @@ private:
 
   tf::TransformBroadcaster tf_pub_;
 
+#ifndef Q_MOC_RUN
   boost::shared_ptr<Oculus> oculus_;
+#endif
 };
 
 } // namespace rviz
 
- #endif
+#endif
+
