@@ -1,3 +1,5 @@
+#version 120
+
 uniform sampler2D WarpTexture;
 uniform vec2 LensCenter;
 uniform vec2 ScreenCenter;
@@ -35,4 +37,4 @@ void main(void)
 	vec2 tcRed = LensCenter + Scale * thetaRed;
 	float red = texture2D(WarpTexture, tcRed).r;
 	gl_FragColor = vec4(red, green, blue, 1);
-};
+}
