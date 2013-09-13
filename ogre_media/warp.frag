@@ -1,3 +1,5 @@
+#version 120
+
 uniform sampler2D WarpTexture;
 
 uniform vec2 LensCenter;
@@ -30,4 +32,4 @@ void main(void)
 //	} else {
 //		gl_FragColor = texture2D(WarpTexture, tc);
 //	}
-};
+}
