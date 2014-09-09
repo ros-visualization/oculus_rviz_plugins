@@ -77,7 +77,6 @@ FixedViewController::~FixedViewController()
 
 void FixedViewController::reset()
 {
-//   FramePositionTrackingViewController::reset();
 }
 
 void FixedViewController::update(float dt, float ros_dt)
