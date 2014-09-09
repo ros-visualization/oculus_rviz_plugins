@@ -51,6 +51,8 @@ add_library(oculus_rviz_plugins
 )
 
 target_link_libraries(oculus_rviz_plugins
+  ${catkin_LIBRARIES}
+  ${QT_LIBRARIES}
   ${OculusSDK_LIBRARIES}
   ${BOOST_LIBRARIES}
 )
